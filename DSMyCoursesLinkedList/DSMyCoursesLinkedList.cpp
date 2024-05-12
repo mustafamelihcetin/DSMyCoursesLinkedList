@@ -1,147 +1,182 @@
-#include <iostream>
+#include "LinkedList.h"
 using namespace std;
+// Node constructor
+Node::Node(int value) : value(value), next(nullptr) {}
 
-// Node class to represent individual nodes in the linked list
-class Node
-{
-public:
-    int value; // Value stored in the node
-    Node* next; // Pointer to the next node
+// Node destructor
+Node::~Node() {}
 
-    // Constructor to initialize the node with a value
-    Node(int value) : value(value), next(nullptr) {}
-};
+// LinkedList constructor
+LinkedList::LinkedList(int value) : head(nullptr), tail(nullptr), length(0) {
+    appendList(value);
+}
 
-// LinkedList class to manage the linked list operations
-class LinkedList {
-private:
-    Node* head; // Pointer to the first node in the list
-    Node* tail; // Pointer to the last node in the list
-    int length; // Length of the list
+// LinkedList destructor
+LinkedList::~LinkedList() {
+    while (head != nullptr) {
+        Node* temp = head;
+        head = head->next;
+        delete temp;
+    }
+}
 
-public:
-    // Constructor to create a new linked list with an initial value
-    LinkedList(int value) : head(nullptr), tail(nullptr), length(0) {
+// Method to append a new node with the given value to the end of the list
+void LinkedList::appendList(int value) {
+    Node* node = new Node(value);
+    if (isEmpty()) {
+        head = node;
+    }
+    else {
+        tail->next = node;
+    }
+    tail = node;
+    length++;
+}
+
+// Method to print all values in the list
+void LinkedList::printList() {
+    Node* current = head;
+    while (current != nullptr) {
+        if (current->next == tail->next) {
+            cout << current->value << endl;
+            return;
+        }
+        else {
+            cout << current->value << "-->";
+            current = current->next;
+        }
+    }
+    cout << endl;
+}
+
+// Method to check if the list is empty
+bool LinkedList::isEmpty() const {
+    return head == nullptr;
+}
+
+// Method to delete the last node in the list
+void LinkedList::deleteLastNode() {
+    if (!isEmpty()) {
+        Node* current = head;
+        Node* previous = nullptr;
+        while (current->next != nullptr) {
+            previous = current;
+            current = current->next;
+        }
+        if (previous != nullptr) {
+            previous->next = nullptr;
+            tail = previous;
+        }
+        else {
+            head = nullptr;
+            tail = nullptr;
+        }
+        delete current;
+        length--;
+        cout << "Last node deleted." << endl;
+    }
+}
+
+// Method to add a new node at the beginning of the list
+void LinkedList::addFirstNode(int value) {
+    Node* node = new Node(value);
+    if (isEmpty()) {
+        tail = node;
+    }
+    node->next = head;
+    head = node;
+    length++;
+}
+
+// Method to delete the first node in the list
+void LinkedList::deleteFirst() {
+    if (!isEmpty()) {
+        Node* temp = head;
+        head = head->next;
+        delete temp;
+        length--;
+        cout << "First node deleted." << endl;
+    }
+}
+
+// Method to get the value of a node at a specific index
+void LinkedList::getNode(int index) {
+    if (index >= 0 && index < length) {
+        Node* current = head;
+        for (int i = 0; i < index; i++) {
+            current = current->next;
+        }
+        cout << "Value at index " << index << ": " << current->value << endl;
+    }
+    else {
+        cout << "Invalid index." << endl;
+    }
+}
+
+// Method to change the value of a node at a specific index
+void LinkedList::changeNodeValue(int index, int newValue) {
+    if (index >= 0 && index < length) {
+        Node* current = head;
+        for (int i = 0; i < index; i++) {
+            current = current->next;
+        }
+        current->value = newValue;
+        cout << "Value at index " << index << " changed to " << newValue << endl;
+    }
+    else {
+        cout << "Invalid index." << endl;
+    }
+}
+
+// Method to insert a new node at the specified index with the given value
+void LinkedList::insertNode(int index, int value) {
+    if (index < 0 || index > length) {
+        cout << "Invalid index." << endl;
+        return;
+    }
+    else if (index == 0) {
+        addFirstNode(value);
+    }
+    else if (index == length) {
         appendList(value);
     }
-
-    // Destructor to delete all nodes in the list
-    ~LinkedList() {
-        while (head != nullptr) {
-            Node* temp = head;
-            head = head->next;
-            delete temp;
-        }
-    }
-
-    // Method to append a new node with the given value to the end of the list
-    void appendList(int value) {
+    else {
         Node* node = new Node(value);
-        if (isEmpty()) {
-            head = node;
-        }
-        else {
-            tail->next = node;
-        }
-        tail = node;
-        length++;
-    }
-
-    // Method to print all values in the list
-    void printList() {
         Node* current = head;
-        while (current != nullptr) {
-            if (current->next == tail->next) {
-                cout << current->value << endl;
-                return;
-            }  
-            else {
-                cout << current->value << "-->";
-                current = current->next;
-            }            
+        for (int i = 0; i < index - 1; i++) {
+            current = current->next;
         }
-        cout << endl;
-    }
-
-    // Method to check if the list is empty
-    bool isEmpty() const {
-        return head == nullptr;
-    }
-
-    // Method to delete the last node in the list
-    void deleteLastNode() {
-        if (!isEmpty()) {
-            Node* current = head;
-            Node* previous = nullptr;
-            while (current->next != nullptr) {
-                previous = current;
-                current = current->next;
-            }
-            if (previous != nullptr) {
-                previous->next = nullptr;
-                tail = previous;
-            }
-            else {
-                head = nullptr;
-                tail = nullptr;
-            }
-            delete current;
-            length--;
-            cout << "Last node deleted." << endl;
-        }
-    }
-
-    // Method to add a new node at the beginning of the list
-    void addFirstNode(int value) {
-        Node* node = new Node(value);
-        if (isEmpty()) {
-            tail = node;
-        }
-        node->next = head;
-        head = node;
+        node->next = current->next;
+        current->next = node;
         length++;
     }
+}
 
-    // Method to delete the first node in the list
-    void deleteFirst() {
-        if (!isEmpty()) {
-            Node* temp = head;
-            head = head->next;
-            delete temp;
-            length--;
-            cout << "First node deleted." << endl;
-        }
+// Method to delete a node at the specified index
+void LinkedList::deleteNode(int index) {
+    if (index < 0 || index >= length) {
+        cout << "Invalid index." << endl;
+        return;
     }
-
-    // Method to get the value of a node at a specific index
-    void getNode(int index) {
-        if (index >= 0 && index < length) {
-            Node* current = head;
-            for (int i = 0; i < index; i++) {
-                current = current->next;
-            }
-            cout << "Value at index " << index << ": " << current->value << endl;
-        }
-        else {
-            cout << "Invalid index." << endl;
-        }
+    else if (index == 0) {
+        deleteFirst();
     }
-
-    // Method to change the value of a node at a specific index
-    void changeNodeValue(int index, int newValue) {
-        if (index >= 0 && index < length) {
-            Node* current = head;
-            for (int i = 0; i < index; i++) {
-                current = current->next;
-            }
-            current->value = newValue;
-            cout << "Value at index " << index << " changed to " << newValue << endl;
-        }
-        else {
-            cout << "Invalid index." << endl;
-        }
+    else if (index == length - 1) {
+        deleteLastNode();
     }
-};
+    else {
+        Node* current = head;
+        Node* previous = nullptr;
+        for (int i = 0; i < index; i++) {
+            previous = current;
+            current = current->next;
+        }
+        previous->next = current->next;
+        delete current;
+        length--;
+    }
+}
+#include "LinkedList.h"
 
 int main()
 {
@@ -184,5 +219,17 @@ int main()
     // Print the final list after all operations
     myList.printList();
 
+    // Add new node to specified index
+    myList.insertNode(3, 37);
+
+    // Print after adding nodes to the index
+    myList.printList();
+
+    // Delete node in specified index
+    myList.deleteNode(2);
+
+    myList.printList();
+
     return 0;
 }
+
